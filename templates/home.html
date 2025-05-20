@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="mk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Сите продукти</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50 text-gray-800 p-10">
+    <h1 class="text-3xl font-bold mb-6 text-center">Сите продукти</h1>
+
+    <div class="text-center mb-6">
+      <form method="get" action="/">
+        <input
+          type="text"
+          name="q"
+          placeholder="Пребарај продукт..."
+          value="{{ request.args.get('q', '') }}"
+          class="px-4 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-orange-400"
+        />
+        <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
+          Барај
+        </button>
+        <a href="{{ url_for('cart') }}" class="ml-4 inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+          Кошничка
+        </a>
+      </form>
+    </div>
+
+    <div class="overflow-x-auto rounded-lg shadow-md">
+      <table class="w-full table-auto bg-white">
+        <thead class="bg-orange-100">
+          <tr class="text-left text-sm font-semibold text-gray-700">
+            <th class="px-4 py-3">Име на артикал</th>
+            <th class="px-4 py-3">Цени по маркети</th>
+            <th class="px-4 py-3">Дејство</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm divide-y divide-gray-100">
+          {% if products %}
+            {% for name, markets in products.items() %}
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-semibold">{{ name }}</td>
+                <td class="px-4 py-2">
+                  {% for market in markets %}
+                    {{ market['market'] }} - {{ market['average_price'] }} ден.<br>
+                  {% endfor %}
+                </td>
+                <td class="px-4 py-2">
+                  <a href="{{ url_for('add_to_cart', product_name=name) }}" class="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 text-sm">
+                    Додај во кошничка
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="3" class="px-4 py-4 text-center text-gray-500">
+                Нема пронајдени продукти.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex justify-center items-center gap-2 mt-8 text-sm">
+      <span class="font-semibold">Страници:</span>
+      {% for p in page_list %}
+        {% if p == '...' %}
+          <span class="px-2">...</span>
+        {% elif p == current_page %}
+          <span class="px-3 py-1 font-bold text-white bg-orange-500 rounded">{{ p }}</span>
+        {% else %}
+          <a href="?q={{ request.args.get('q', '') }}&sort={{ current_sort }}&order={{ current_order }}&page={{ p }}"
+             class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-orange-100">{{ p }}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </body>
+</html>
